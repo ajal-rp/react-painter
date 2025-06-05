@@ -20,9 +20,7 @@ function App() {
     ctx.strokeStyle = lineColor;
     ctxRef.current = ctx;
 
-    console.log("lineColor", lineColor);
-    console.log("lineWidth", lineWidth);
-    console.log("lineOpacity", lineOpacity);
+    
   }, [lineWidth, lineColor, lineOpacity]);
 
   const startDrawing = (e) => {
@@ -36,8 +34,6 @@ function App() {
   };
   const draw = (e) => {
     if (!isDrawing) return;
-
-    console.log("drawing: ", e.nativeEvent.offsetX);
     ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     ctxRef.current.stroke();
   };
