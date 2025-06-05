@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { use, useEffect, useRef, useState } from "react";
+import "./App.css";
+import Menu from "./Menu";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [lineWidth, setLineWidth] = useState(5);
+  const [lineColor, setLineColor] = useState("black");
+  const [lineOpacity, setLineOpacity] = useState(0.1);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.globalAlpha = lineOpacity;
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = lineColor;
+    ctxRef.current = ctx;
+
+    console.log("lineColor", lineColor);
+    console.log("lineWidth", lineWidth);
+    console.log("lineOpacity", lineOpacity);
+  }, [lineWidth, lineColor, lineOpacity]);
+
+  const startDrawing = (e) => {
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    setIsDrawing(true);
+  };
+  const stopDrawing = (e) => {
+    ctxRef.current.closePath();
+    setIsDrawing(false);
+  };
+  const draw = (e) => {
+    if (!isDrawing) return;
+
+    console.log("drawing: ", e.nativeEvent.offsetX);
+    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    ctxRef.current.stroke();
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="App">
+        <h1>Painter</h1>
+        <div className="draw-area">
+          <Menu
+            setLineWidth={setLineWidth}
+            setLineColor={setLineColor}
+            setLineOpacity={setLineOpacity}
+          />
+          <canvas
+            width={"1280px"}
+            height={"720px"}
+            onMouseDown={startDrawing}
+            onMouseUp={stopDrawing}
+            onMouseMove={draw}
+            ref={canvasRef}
+          ></canvas>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
